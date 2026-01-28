@@ -7,9 +7,9 @@ import '../../../../../config/app_text_styles.dart';
 import '../../../../../core/utils/extensions.dart';
 import '../../../../../shared/widgets/custom_button.dart';
 
-// Conditional import for web download
-import '../../../../../core/utils/web_downloader.dart'
-    if (dart.library.io) '../../../../../core/utils/web_downloader_stub.dart';
+// Conditional import for web download - use stub for non-web platforms
+import '../../../../../core/utils/web_downloader_stub.dart'
+    if (dart.library.js_interop) '../../../../../core/utils/web_downloader.dart';
 
 /// Hero section with animated name and title
 class HeroSection extends StatelessWidget {

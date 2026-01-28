@@ -1,7 +1,7 @@
 import 'dart:convert';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import 'dart:js_interop';
 import 'package:flutter/services.dart';
+import 'package:web/web.dart' as web;
 
 /// Utility class for downloading files on web platform
 class WebDownloader {
@@ -16,16 +16,20 @@ class WebDownloader {
       final bytes = byteData.buffer.asUint8List();
 
       // Create a blob and download link
-      final blob = html.Blob([bytes], 'application/pdf');
-      final url = html.Url.createObjectUrlFromBlob(blob);
+      final blob = web.Blob(
+        [bytes.toJS].toJS,
+        web.BlobPropertyBag(type: 'application/pdf'),
+      );
+      final url = web.URL.createObjectURL(blob);
 
       // Create and click the download link
-      html.AnchorElement(href: url)
-        ..setAttribute('download', fileName)
-        ..click();
+      final anchor = web.document.createElement('a') as web.HTMLAnchorElement;
+      anchor.href = url;
+      anchor.download = fileName;
+      anchor.click();
 
       // Clean up the URL
-      html.Url.revokeObjectUrl(url);
+      web.URL.revokeObjectURL(url);
     } catch (e) {
       // Fallback: open PDF in new tab
       final byteData = await rootBundle.load(assetPath);
@@ -33,7 +37,7 @@ class WebDownloader {
       final base64 = base64Encode(bytes);
       final dataUrl = 'data:application/pdf;base64,$base64';
 
-      html.window.open(dataUrl, '_blank');
+      web.window.open(dataUrl, '_blank');
     }
   }
 }
